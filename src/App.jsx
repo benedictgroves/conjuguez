@@ -4,90 +4,195 @@ const PRONOUNS = ["je", "tu", "il/elle", "nous", "vous", "ils/elles"];
 
 const VERBS = {
   parler: {
+    english: "to speak",
+    english_conj: {
+      présent: ["I speak", "you speak", "he/she speaks", "we speak", "you speak", "they speak"],
+      "passé composé": ["I spoke", "you spoke", "he/she spoke", "we spoke", "you spoke", "they spoke"],
+      imparfait: ["I used to speak", "you used to speak", "he/she used to speak", "we used to speak", "you used to speak", "they used to speak"],
+      futur: ["I will speak", "you will speak", "he/she will speak", "we will speak", "you will speak", "they will speak"],
+    },
     présent: ["parle", "parles", "parle", "parlons", "parlez", "parlent"],
     "passé composé": ["ai parlé", "as parlé", "a parlé", "avons parlé", "avez parlé", "ont parlé"],
     imparfait: ["parlais", "parlais", "parlait", "parlions", "parliez", "parlaient"],
     futur: ["parlerai", "parleras", "parlera", "parlerons", "parlerez", "parleront"],
   },
   manger: {
+    english: "to eat",
+    english_conj: {
+      présent: ["I eat", "you eat", "he/she eats", "we eat", "you eat", "they eat"],
+      "passé composé": ["I ate", "you ate", "he/she ate", "we ate", "you ate", "they ate"],
+      imparfait: ["I used to eat", "you used to eat", "he/she used to eat", "we used to eat", "you used to eat", "they used to eat"],
+      futur: ["I will eat", "you will eat", "he/she will eat", "we will eat", "you will eat", "they will eat"],
+    },
     présent: ["mange", "manges", "mange", "mangeons", "mangez", "mangent"],
     "passé composé": ["ai mangé", "as mangé", "a mangé", "avons mangé", "avez mangé", "ont mangé"],
     imparfait: ["mangeais", "mangeais", "mangeait", "mangions", "mangiez", "mangeaient"],
     futur: ["mangerai", "mangeras", "mangera", "mangerons", "mangerez", "mangeront"],
   },
   aimer: {
+    english: "to like / to love",
+    english_conj: {
+      présent: ["I like", "you like", "he/she likes", "we like", "you like", "they like"],
+      "passé composé": ["I liked", "you liked", "he/she liked", "we liked", "you liked", "they liked"],
+      imparfait: ["I used to like", "you used to like", "he/she used to like", "we used to like", "you used to like", "they used to like"],
+      futur: ["I will like", "you will like", "he/she will like", "we will like", "you will like", "they will like"],
+    },
     présent: ["aime", "aimes", "aime", "aimons", "aimez", "aiment"],
     "passé composé": ["ai aimé", "as aimé", "a aimé", "avons aimé", "avez aimé", "ont aimé"],
     imparfait: ["aimais", "aimais", "aimait", "aimions", "aimiez", "aimaient"],
     futur: ["aimerai", "aimeras", "aimera", "aimerons", "aimerez", "aimeront"],
   },
   finir: {
+    english: "to finish",
+    english_conj: {
+      présent: ["I finish", "you finish", "he/she finishes", "we finish", "you finish", "they finish"],
+      "passé composé": ["I finished", "you finished", "he/she finished", "we finished", "you finished", "they finished"],
+      imparfait: ["I used to finish", "you used to finish", "he/she used to finish", "we used to finish", "you used to finish", "they used to finish"],
+      futur: ["I will finish", "you will finish", "he/she will finish", "we will finish", "you will finish", "they will finish"],
+    },
     présent: ["finis", "finis", "finit", "finissons", "finissez", "finissent"],
     "passé composé": ["ai fini", "as fini", "a fini", "avons fini", "avez fini", "ont fini"],
     imparfait: ["finissais", "finissais", "finissait", "finissions", "finissiez", "finissaient"],
     futur: ["finirai", "finiras", "finira", "finirons", "finirez", "finiront"],
   },
   vendre: {
+    english: "to sell",
+    english_conj: {
+      présent: ["I sell", "you sell", "he/she sells", "we sell", "you sell", "they sell"],
+      "passé composé": ["I sold", "you sold", "he/she sold", "we sold", "you sold", "they sold"],
+      imparfait: ["I used to sell", "you used to sell", "he/she used to sell", "we used to sell", "you used to sell", "they used to sell"],
+      futur: ["I will sell", "you will sell", "he/she will sell", "we will sell", "you will sell", "they will sell"],
+    },
     présent: ["vends", "vends", "vend", "vendons", "vendez", "vendent"],
     "passé composé": ["ai vendu", "as vendu", "a vendu", "avons vendu", "avez vendu", "ont vendu"],
     imparfait: ["vendais", "vendais", "vendait", "vendions", "vendiez", "vendaient"],
     futur: ["vendrai", "vendras", "vendra", "vendrons", "vendrez", "vendront"],
   },
   être: {
+    english: "to be",
+    english_conj: {
+      présent: ["I am", "you are", "he/she is", "we are", "you are", "they are"],
+      "passé composé": ["I was", "you were", "he/she was", "we were", "you were", "they were"],
+      imparfait: ["I used to be", "you used to be", "he/she used to be", "we used to be", "you used to be", "they used to be"],
+      futur: ["I will be", "you will be", "he/she will be", "we will be", "you will be", "they will be"],
+    },
     présent: ["suis", "es", "est", "sommes", "êtes", "sont"],
     "passé composé": ["ai été", "as été", "a été", "avons été", "avez été", "ont été"],
     imparfait: ["étais", "étais", "était", "étions", "étiez", "étaient"],
     futur: ["serai", "seras", "sera", "serons", "serez", "seront"],
   },
   avoir: {
+    english: "to have",
+    english_conj: {
+      présent: ["I have", "you have", "he/she has", "we have", "you have", "they have"],
+      "passé composé": ["I had", "you had", "he/she had", "we had", "you had", "they had"],
+      imparfait: ["I used to have", "you used to have", "he/she used to have", "we used to have", "you used to have", "they used to have"],
+      futur: ["I will have", "you will have", "he/she will have", "we will have", "you will have", "they will have"],
+    },
     présent: ["ai", "as", "a", "avons", "avez", "ont"],
     "passé composé": ["ai eu", "as eu", "a eu", "avons eu", "avez eu", "ont eu"],
     imparfait: ["avais", "avais", "avait", "avions", "aviez", "avaient"],
     futur: ["aurai", "auras", "aura", "aurons", "aurez", "auront"],
   },
   aller: {
+    english: "to go",
+    english_conj: {
+      présent: ["I go", "you go", "he/she goes", "we go", "you go", "they go"],
+      "passé composé": ["I went", "you went", "he/she went", "we went", "you went", "they went"],
+      imparfait: ["I used to go", "you used to go", "he/she used to go", "we used to go", "you used to go", "they used to go"],
+      futur: ["I will go", "you will go", "he/she will go", "we will go", "you will go", "they will go"],
+    },
     présent: ["vais", "vas", "va", "allons", "allez", "vont"],
     "passé composé": ["suis allé(e)", "es allé(e)", "est allé(e)", "sommes allé(e)s", "êtes allé(e)s", "sont allé(e)s"],
     imparfait: ["allais", "allais", "allait", "allions", "alliez", "allaient"],
     futur: ["irai", "iras", "ira", "irons", "irez", "iront"],
   },
   faire: {
+    english: "to do / to make",
+    english_conj: {
+      présent: ["I do", "you do", "he/she does", "we do", "you do", "they do"],
+      "passé composé": ["I did", "you did", "he/she did", "we did", "you did", "they did"],
+      imparfait: ["I used to do", "you used to do", "he/she used to do", "we used to do", "you used to do", "they used to do"],
+      futur: ["I will do", "you will do", "he/she will do", "we will do", "you will do", "they will do"],
+    },
     présent: ["fais", "fais", "fait", "faisons", "faites", "font"],
     "passé composé": ["ai fait", "as fait", "a fait", "avons fait", "avez fait", "ont fait"],
     imparfait: ["faisais", "faisais", "faisait", "faisions", "faisiez", "faisaient"],
     futur: ["ferai", "feras", "fera", "ferons", "ferez", "feront"],
   },
   pouvoir: {
+    english: "to be able to / can",
+    english_conj: {
+      présent: ["I can", "you can", "he/she can", "we can", "you can", "they can"],
+      "passé composé": ["I could", "you could", "he/she could", "we could", "you could", "they could"],
+      imparfait: ["I used to be able", "you used to be able", "he/she used to be able", "we used to be able", "you used to be able", "they used to be able"],
+      futur: ["I will be able", "you will be able", "he/she will be able", "we will be able", "you will be able", "they will be able"],
+    },
     présent: ["peux", "peux", "peut", "pouvons", "pouvez", "peuvent"],
     "passé composé": ["ai pu", "as pu", "a pu", "avons pu", "avez pu", "ont pu"],
     imparfait: ["pouvais", "pouvais", "pouvait", "pouvions", "pouviez", "pouvaient"],
     futur: ["pourrai", "pourras", "pourra", "pourrons", "pourrez", "pourront"],
   },
   vouloir: {
+    english: "to want",
+    english_conj: {
+      présent: ["I want", "you want", "he/she wants", "we want", "you want", "they want"],
+      "passé composé": ["I wanted", "you wanted", "he/she wanted", "we wanted", "you wanted", "they wanted"],
+      imparfait: ["I used to want", "you used to want", "he/she used to want", "we used to want", "you used to want", "they used to want"],
+      futur: ["I will want", "you will want", "he/she will want", "we will want", "you will want", "they will want"],
+    },
     présent: ["veux", "veux", "veut", "voulons", "voulez", "veulent"],
     "passé composé": ["ai voulu", "as voulu", "a voulu", "avons voulu", "avez voulu", "ont voulu"],
     imparfait: ["voulais", "voulais", "voulait", "voulions", "vouliez", "voulaient"],
     futur: ["voudrai", "voudras", "voudra", "voudrons", "voudrez", "voudront"],
   },
   venir: {
+    english: "to come",
+    english_conj: {
+      présent: ["I come", "you come", "he/she comes", "we come", "you come", "they come"],
+      "passé composé": ["I came", "you came", "he/she came", "we came", "you came", "they came"],
+      imparfait: ["I used to come", "you used to come", "he/she used to come", "we used to come", "you used to come", "they used to come"],
+      futur: ["I will come", "you will come", "he/she will come", "we will come", "you will come", "they will come"],
+    },
     présent: ["viens", "viens", "vient", "venons", "venez", "viennent"],
     "passé composé": ["suis venu(e)", "es venu(e)", "est venu(e)", "sommes venu(e)s", "êtes venu(e)s", "sont venu(e)s"],
     imparfait: ["venais", "venais", "venait", "venions", "veniez", "venaient"],
     futur: ["viendrai", "viendras", "viendra", "viendrons", "viendrez", "viendront"],
   },
   prendre: {
+    english: "to take",
+    english_conj: {
+      présent: ["I take", "you take", "he/she takes", "we take", "you take", "they take"],
+      "passé composé": ["I took", "you took", "he/she took", "we took", "you took", "they took"],
+      imparfait: ["I used to take", "you used to take", "he/she used to take", "we used to take", "you used to take", "they used to take"],
+      futur: ["I will take", "you will take", "he/she will take", "we will take", "you will take", "they will take"],
+    },
     présent: ["prends", "prends", "prend", "prenons", "prenez", "prennent"],
     "passé composé": ["ai pris", "as pris", "a pris", "avons pris", "avez pris", "ont pris"],
     imparfait: ["prenais", "prenais", "prenait", "prenions", "preniez", "prenaient"],
     futur: ["prendrai", "prendras", "prendra", "prendrons", "prendrez", "prendront"],
   },
   savoir: {
+    english: "to know (a fact)",
+    english_conj: {
+      présent: ["I know", "you know", "he/she knows", "we know", "you know", "they know"],
+      "passé composé": ["I knew", "you knew", "he/she knew", "we knew", "you knew", "they knew"],
+      imparfait: ["I used to know", "you used to know", "he/she used to know", "we used to know", "you used to know", "they used to know"],
+      futur: ["I will know", "you will know", "he/she will know", "we will know", "you will know", "they will know"],
+    },
     présent: ["sais", "sais", "sait", "savons", "savez", "savent"],
     "passé composé": ["ai su", "as su", "a su", "avons su", "avez su", "ont su"],
     imparfait: ["savais", "savais", "savait", "savions", "saviez", "savaient"],
     futur: ["saurai", "sauras", "saura", "saurons", "saurez", "sauront"],
   },
   devoir: {
+    english: "to have to / must",
+    english_conj: {
+      présent: ["I must", "you must", "he/she must", "we must", "you must", "they must"],
+      "passé composé": ["I had to", "you had to", "he/she had to", "we had to", "you had to", "they had to"],
+      imparfait: ["I used to have to", "you used to have to", "he/she used to have to", "we used to have to", "you used to have to", "they used to have to"],
+      futur: ["I will have to", "you will have to", "he/she will have to", "we will have to", "you will have to", "they will have to"],
+    },
     présent: ["dois", "dois", "doit", "devons", "devez", "doivent"],
     "passé composé": ["ai dû", "as dû", "a dû", "avons dû", "avez dû", "ont dû"],
     imparfait: ["devais", "devais", "devait", "devions", "deviez", "devaient"],
@@ -351,6 +456,7 @@ export default function FrenchVerbApp() {
   const [groupFilter, setGroupFilter] = useState(null);
   const [guideOpen, setGuideOpen] = useState(false);
   const [instantMode, setInstantMode] = useState(true);
+  const [showEnglish, setShowEnglish] = useState(false);
 
   const filteredVerbNames = groupFilter
     ? verbNames.filter((v) => VERB_GROUPS[groupFilter].verbs.includes(v))
@@ -557,6 +663,47 @@ export default function FrenchVerbApp() {
           </span>
           Instant feedback
         </button>
+        <button
+          onClick={() => setShowEnglish(!showEnglish)}
+          style={{
+            marginTop: 10,
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 8,
+            fontSize: 13,
+            fontWeight: 600,
+            color: showEnglish ? "#2563EB" : "#8B9CC0",
+            background: showEnglish ? "#EFF6FF" : "rgba(255,255,255,0.06)",
+            border: `1.5px solid ${showEnglish ? "#3B82F6" : "#3D4F6F"}`,
+            borderRadius: 20,
+            padding: "6px 16px",
+            cursor: "pointer",
+            transition: "all 0.15s",
+          }}
+        >
+          <span style={{
+            width: 32,
+            height: 18,
+            borderRadius: 9,
+            background: showEnglish ? "#3B82F6" : "#CBD5E1",
+            position: "relative",
+            display: "inline-block",
+            transition: "background 0.2s",
+          }}>
+            <span style={{
+              position: "absolute",
+              top: 2,
+              left: showEnglish ? 16 : 2,
+              width: 14,
+              height: 14,
+              borderRadius: "50%",
+              background: "#fff",
+              transition: "left 0.2s",
+              boxShadow: "0 1px 2px rgba(0,0,0,0.15)",
+            }} />
+          </span>
+          Show English
+        </button>
       </div>
 
       {/* Verb group filter */}
@@ -729,6 +876,19 @@ export default function FrenchVerbApp() {
         })()}
       </div>
 
+      {showEnglish && (
+        <div style={{
+          textAlign: "center",
+          marginBottom: 16,
+          fontSize: 15,
+          fontWeight: 500,
+          color: "#93AEDB",
+          fontStyle: "italic",
+        }}>
+          {verb} — {VERBS[verb].english}
+        </div>
+      )}
+
       {/* Four quadrants */}
       <div style={{
         display: "grid",
@@ -749,6 +909,7 @@ export default function FrenchVerbApp() {
               selectedChip={selectedChip}
               onSlotTap={handleSlotTap}
               instantMode={instantMode}
+              showEnglish={showEnglish}
             />
           </div>
         ))}
@@ -908,7 +1069,7 @@ export default function FrenchVerbApp() {
 }
 
 // Quadrant variant that supports tap-to-place
-function QuadrantWithSlotTap({ tense, verb, placements, onDrop, onRemove, checked, corrections, selectedChip, onSlotTap, instantMode }) {
+function QuadrantWithSlotTap({ tense, verb, placements, onDrop, onRemove, checked, corrections, selectedChip, onSlotTap, instantMode, showEnglish }) {
   const colors = TENSE_COLORS[tense];
   const [dragOverSlot, setDragOverSlot] = useState(null);
   const data = VERBS[verb];
@@ -984,7 +1145,8 @@ function QuadrantWithSlotTap({ tense, verb, placements, onDrop, onRemove, checke
               }}
             >
               <span style={{
-                width: 72,
+                width: showEnglish ? 'auto' : 72,
+                minWidth: 72,
                 fontSize: 13,
                 color: "#64748B",
                 fontStyle: "italic",
@@ -992,6 +1154,16 @@ function QuadrantWithSlotTap({ tense, verb, placements, onDrop, onRemove, checke
                 flexShrink: 0,
               }}>
                 {pronoun}
+                {showEnglish && data.english_conj && (
+                  <span style={{
+                    fontSize: 11,
+                    color: "#94A3B8",
+                    fontStyle: "normal",
+                    marginLeft: 4,
+                  }}>
+                    ({data.english_conj[tense][i]})
+                  </span>
+                )}
               </span>
               <div style={{
                 flex: 1,
