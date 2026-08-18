@@ -495,11 +495,12 @@ export default function FrenchVerbApp() {
   return (
     <div style={{
       fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
-      maxWidth: 900,
+      maxWidth: "100%",
       margin: "0 auto",
       padding: "24px 16px",
       minHeight: "100vh",
       background: "#1B2A4A",
+      boxSizing: "border-box",
     }}>
       {/* Header */}
       <div style={{ textAlign: "center", marginBottom: 24 }}>
@@ -731,7 +732,7 @@ export default function FrenchVerbApp() {
       {/* Four quadrants */}
       <div style={{
         display: "grid",
-        gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+        gridTemplateColumns: "repeat(2, 1fr)",
         gap: 16,
         marginBottom: 20,
       }}>
