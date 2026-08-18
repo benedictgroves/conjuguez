@@ -198,6 +198,240 @@ const VERBS = {
     imparfait: ["devais", "devais", "devait", "devions", "deviez", "devaient"],
     futur: ["devrai", "devras", "devra", "devrons", "devrez", "devront"],
   },
+  dire: {
+    english: "to say / to tell",
+    english_conj: {
+      présent: ["I say", "you say", "he/she says", "we say", "you say", "they say"],
+      "passé composé": ["I said", "you said", "he/she said", "we said", "you said", "they said"],
+      imparfait: ["I used to say", "you used to say", "he/she used to say", "we used to say", "you used to say", "they used to say"],
+      futur: ["I will say", "you will say", "he/she will say", "we will say", "you will say", "they will say"],
+    },
+    présent: ["dis", "dis", "dit", "disons", "dites", "disent"],
+    "passé composé": ["ai dit", "as dit", "a dit", "avons dit", "avez dit", "ont dit"],
+    imparfait: ["disais", "disais", "disait", "disions", "disiez", "disaient"],
+    futur: ["dirai", "diras", "dira", "dirons", "direz", "diront"],
+  },
+  voir: {
+    english: "to see",
+    english_conj: {
+      présent: ["I see", "you see", "he/she sees", "we see", "you see", "they see"],
+      "passé composé": ["I saw", "you saw", "he/she saw", "we saw", "you saw", "they saw"],
+      imparfait: ["I used to see", "you used to see", "he/she used to see", "we used to see", "you used to see", "they used to see"],
+      futur: ["I will see", "you will see", "he/she will see", "we will see", "you will see", "they will see"],
+    },
+    présent: ["vois", "vois", "voit", "voyons", "voyez", "voient"],
+    "passé composé": ["ai vu", "as vu", "a vu", "avons vu", "avez vu", "ont vu"],
+    imparfait: ["voyais", "voyais", "voyait", "voyions", "voyiez", "voyaient"],
+    futur: ["verrai", "verras", "verra", "verrons", "verrez", "verront"],
+  },
+  croire: {
+    english: "to believe",
+    english_conj: {
+      présent: ["I believe", "you believe", "he/she believes", "we believe", "you believe", "they believe"],
+      "passé composé": ["I believed", "you believed", "he/she believed", "we believed", "you believed", "they believed"],
+      imparfait: ["I used to believe", "you used to believe", "he/she used to believe", "we used to believe", "you used to believe", "they used to believe"],
+      futur: ["I will believe", "you will believe", "he/she will believe", "we will believe", "you will believe", "they will believe"],
+    },
+    présent: ["crois", "crois", "croit", "croyons", "croyez", "croient"],
+    "passé composé": ["ai cru", "as cru", "a cru", "avons cru", "avez cru", "ont cru"],
+    imparfait: ["croyais", "croyais", "croyait", "croyions", "croyiez", "croyaient"],
+    futur: ["croirai", "croiras", "croira", "croirons", "croirez", "croiront"],
+  },
+  mettre: {
+    english: "to put / to place",
+    english_conj: {
+      présent: ["I put", "you put", "he/she puts", "we put", "you put", "they put"],
+      "passé composé": ["I put", "you put", "he/she put", "we put", "you put", "they put"],
+      imparfait: ["I used to put", "you used to put", "he/she used to put", "we used to put", "you used to put", "they used to put"],
+      futur: ["I will put", "you will put", "he/she will put", "we will put", "you will put", "they will put"],
+    },
+    présent: ["mets", "mets", "met", "mettons", "mettez", "mettent"],
+    "passé composé": ["ai mis", "as mis", "a mis", "avons mis", "avez mis", "ont mis"],
+    imparfait: ["mettais", "mettais", "mettait", "mettions", "mettiez", "mettaient"],
+    futur: ["mettrai", "mettras", "mettra", "mettrons", "mettrez", "mettront"],
+  },
+  lire: {
+    english: "to read",
+    english_conj: {
+      présent: ["I read", "you read", "he/she reads", "we read", "you read", "they read"],
+      "passé composé": ["I read", "you read", "he/she read", "we read", "you read", "they read"],
+      imparfait: ["I used to read", "you used to read", "he/she used to read", "we used to read", "you used to read", "they used to read"],
+      futur: ["I will read", "you will read", "he/she will read", "we will read", "you will read", "they will read"],
+    },
+    présent: ["lis", "lis", "lit", "lisons", "lisez", "lisent"],
+    "passé composé": ["ai lu", "as lu", "a lu", "avons lu", "avez lu", "ont lu"],
+    imparfait: ["lisais", "lisais", "lisait", "lisions", "lisiez", "lisaient"],
+    futur: ["lirai", "liras", "lira", "lirons", "lirez", "liront"],
+  },
+  écrire: {
+    english: "to write",
+    english_conj: {
+      présent: ["I write", "you write", "he/she writes", "we write", "you write", "they write"],
+      "passé composé": ["I wrote", "you wrote", "he/she wrote", "we wrote", "you wrote", "they wrote"],
+      imparfait: ["I used to write", "you used to write", "he/she used to write", "we used to write", "you used to write", "they used to write"],
+      futur: ["I will write", "you will write", "he/she will write", "we will write", "you will write", "they will write"],
+    },
+    présent: ["écris", "écris", "écrit", "écrivons", "écrivez", "écrivent"],
+    "passé composé": ["ai écrit", "as écrit", "a écrit", "avons écrit", "avez écrit", "ont écrit"],
+    imparfait: ["écrivais", "écrivais", "écrivait", "écrivions", "écriviez", "écrivaient"],
+    futur: ["écrirai", "écriras", "écrira", "écrirons", "écrirez", "écriront"],
+  },
+  dormir: {
+    english: "to sleep",
+    english_conj: {
+      présent: ["I sleep", "you sleep", "he/she sleeps", "we sleep", "you sleep", "they sleep"],
+      "passé composé": ["I slept", "you slept", "he/she slept", "we slept", "you slept", "they slept"],
+      imparfait: ["I used to sleep", "you used to sleep", "he/she used to sleep", "we used to sleep", "you used to sleep", "they used to sleep"],
+      futur: ["I will sleep", "you will sleep", "he/she will sleep", "we will sleep", "you will sleep", "they will sleep"],
+    },
+    présent: ["dors", "dors", "dort", "dormons", "dormez", "dorment"],
+    "passé composé": ["ai dormi", "as dormi", "a dormi", "avons dormi", "avez dormi", "ont dormi"],
+    imparfait: ["dormais", "dormais", "dormait", "dormions", "dormiez", "dormaient"],
+    futur: ["dormirai", "dormiras", "dormira", "dormirons", "dormirez", "dormiront"],
+  },
+  sortir: {
+    english: "to go out / to leave",
+    english_conj: {
+      présent: ["I go out", "you go out", "he/she goes out", "we go out", "you go out", "they go out"],
+      "passé composé": ["I went out", "you went out", "he/she went out", "we went out", "you went out", "they went out"],
+      imparfait: ["I used to go out", "you used to go out", "he/she used to go out", "we used to go out", "you used to go out", "they used to go out"],
+      futur: ["I will go out", "you will go out", "he/she will go out", "we will go out", "you will go out", "they will go out"],
+    },
+    présent: ["sors", "sors", "sort", "sortons", "sortez", "sortent"],
+    "passé composé": ["suis sorti(e)", "es sorti(e)", "est sorti(e)", "sommes sorti(e)s", "êtes sorti(e)s", "sont sorti(e)s"],
+    imparfait: ["sortais", "sortais", "sortait", "sortions", "sortiez", "sortaient"],
+    futur: ["sortirai", "sortiras", "sortira", "sortirons", "sortirez", "sortiront"],
+  },
+  partir: {
+    english: "to leave / to depart",
+    english_conj: {
+      présent: ["I leave", "you leave", "he/she leaves", "we leave", "you leave", "they leave"],
+      "passé composé": ["I left", "you left", "he/she left", "we left", "you left", "they left"],
+      imparfait: ["I used to leave", "you used to leave", "he/she used to leave", "we used to leave", "you used to leave", "they used to leave"],
+      futur: ["I will leave", "you will leave", "he/she will leave", "we will leave", "you will leave", "they will leave"],
+    },
+    présent: ["pars", "pars", "part", "partons", "partez", "partent"],
+    "passé composé": ["suis parti(e)", "es parti(e)", "est parti(e)", "sommes parti(e)s", "êtes parti(e)s", "sont parti(e)s"],
+    imparfait: ["partais", "partais", "partait", "partions", "partiez", "partaient"],
+    futur: ["partirai", "partiras", "partira", "partirons", "partirez", "partiront"],
+  },
+  donner: {
+    english: "to give",
+    english_conj: {
+      présent: ["I give", "you give", "he/she gives", "we give", "you give", "they give"],
+      "passé composé": ["I gave", "you gave", "he/she gave", "we gave", "you gave", "they gave"],
+      imparfait: ["I used to give", "you used to give", "he/she used to give", "we used to give", "you used to give", "they used to give"],
+      futur: ["I will give", "you will give", "he/she will give", "we will give", "you will give", "they will give"],
+    },
+    présent: ["donne", "donnes", "donne", "donnons", "donnez", "donnent"],
+    "passé composé": ["ai donné", "as donné", "a donné", "avons donné", "avez donné", "ont donné"],
+    imparfait: ["donnais", "donnais", "donnait", "donnions", "donniez", "donnaient"],
+    futur: ["donnerai", "donneras", "donnera", "donnerons", "donnerez", "donneront"],
+  },
+  trouver: {
+    english: "to find",
+    english_conj: {
+      présent: ["I find", "you find", "he/she finds", "we find", "you find", "they find"],
+      "passé composé": ["I found", "you found", "he/she found", "we found", "you found", "they found"],
+      imparfait: ["I used to find", "you used to find", "he/she used to find", "we used to find", "you used to find", "they used to find"],
+      futur: ["I will find", "you will find", "he/she will find", "we will find", "you will find", "they will find"],
+    },
+    présent: ["trouve", "trouves", "trouve", "trouvons", "trouvez", "trouvent"],
+    "passé composé": ["ai trouvé", "as trouvé", "a trouvé", "avons trouvé", "avez trouvé", "ont trouvé"],
+    imparfait: ["trouvais", "trouvais", "trouvait", "trouvions", "trouviez", "trouvaient"],
+    futur: ["trouverai", "trouveras", "trouvera", "trouverons", "trouverez", "trouveront"],
+  },
+  penser: {
+    english: "to think",
+    english_conj: {
+      présent: ["I think", "you think", "he/she thinks", "we think", "you think", "they think"],
+      "passé composé": ["I thought", "you thought", "he/she thought", "we thought", "you thought", "they thought"],
+      imparfait: ["I used to think", "you used to think", "he/she used to think", "we used to think", "you used to think", "they used to think"],
+      futur: ["I will think", "you will think", "he/she will think", "we will think", "you will think", "they will think"],
+    },
+    présent: ["pense", "penses", "pense", "pensons", "pensez", "pensent"],
+    "passé composé": ["ai pensé", "as pensé", "a pensé", "avons pensé", "avez pensé", "ont pensé"],
+    imparfait: ["pensais", "pensais", "pensait", "pensions", "pensiez", "pensaient"],
+    futur: ["penserai", "penseras", "pensera", "penserons", "penserez", "penseront"],
+  },
+  attendre: {
+    english: "to wait",
+    english_conj: {
+      présent: ["I wait", "you wait", "he/she waits", "we wait", "you wait", "they wait"],
+      "passé composé": ["I waited", "you waited", "he/she waited", "we waited", "you waited", "they waited"],
+      imparfait: ["I used to wait", "you used to wait", "he/she used to wait", "we used to wait", "you used to wait", "they used to wait"],
+      futur: ["I will wait", "you will wait", "he/she will wait", "we will wait", "you will wait", "they will wait"],
+    },
+    présent: ["attends", "attends", "attend", "attendons", "attendez", "attendent"],
+    "passé composé": ["ai attendu", "as attendu", "a attendu", "avons attendu", "avez attendu", "ont attendu"],
+    imparfait: ["attendais", "attendais", "attendait", "attendions", "attendiez", "attendaient"],
+    futur: ["attendrai", "attendras", "attendra", "attendrons", "attendrez", "attendront"],
+  },
+  répondre: {
+    english: "to answer",
+    english_conj: {
+      présent: ["I answer", "you answer", "he/she answers", "we answer", "you answer", "they answer"],
+      "passé composé": ["I answered", "you answered", "he/she answered", "we answered", "you answered", "they answered"],
+      imparfait: ["I used to answer", "you used to answer", "he/she used to answer", "we used to answer", "you used to answer", "they used to answer"],
+      futur: ["I will answer", "you will answer", "he/she will answer", "we will answer", "you will answer", "they will answer"],
+    },
+    présent: ["réponds", "réponds", "répond", "répondons", "répondez", "répondent"],
+    "passé composé": ["ai répondu", "as répondu", "a répondu", "avons répondu", "avez répondu", "ont répondu"],
+    imparfait: ["répondais", "répondais", "répondait", "répondions", "répondiez", "répondaient"],
+    futur: ["répondrai", "répondras", "répondra", "répondrons", "répondrez", "répondront"],
+  },
+  choisir: {
+    english: "to choose",
+    english_conj: {
+      présent: ["I choose", "you choose", "he/she chooses", "we choose", "you choose", "they choose"],
+      "passé composé": ["I chose", "you chose", "he/she chose", "we chose", "you chose", "they chose"],
+      imparfait: ["I used to choose", "you used to choose", "he/she used to choose", "we used to choose", "you used to choose", "they used to choose"],
+      futur: ["I will choose", "you will choose", "he/she will choose", "we will choose", "you will choose", "they will choose"],
+    },
+    présent: ["choisis", "choisis", "choisit", "choisissons", "choisissez", "choisissent"],
+    "passé composé": ["ai choisi", "as choisi", "a choisi", "avons choisi", "avez choisi", "ont choisi"],
+    imparfait: ["choisissais", "choisissais", "choisissait", "choisissions", "choisissiez", "choisissaient"],
+    futur: ["choisirai", "choisiras", "choisira", "choisirons", "choisirez", "choisiront"],
+  },
+  connaître: {
+    english: "to know (a person/place)",
+    english_conj: {
+      présent: ["I know", "you know", "he/she knows", "we know", "you know", "they know"],
+      "passé composé": ["I knew", "you knew", "he/she knew", "we knew", "you knew", "they knew"],
+      imparfait: ["I used to know", "you used to know", "he/she used to know", "we used to know", "you used to know", "they used to know"],
+      futur: ["I will know", "you will know", "he/she will know", "we will know", "you will know", "they will know"],
+    },
+    présent: ["connais", "connais", "connaît", "connaissons", "connaissez", "connaissent"],
+    "passé composé": ["ai connu", "as connu", "a connu", "avons connu", "avez connu", "ont connu"],
+    imparfait: ["connaissais", "connaissais", "connaissait", "connaissions", "connaissiez", "connaissaient"],
+    futur: ["connaîtrai", "connaîtras", "connaîtra", "connaîtrons", "connaîtrez", "connaîtront"],
+  },
+  boire: {
+    english: "to drink",
+    english_conj: {
+      présent: ["I drink", "you drink", "he/she drinks", "we drink", "you drink", "they drink"],
+      "passé composé": ["I drank", "you drank", "he/she drank", "we drank", "you drank", "they drank"],
+      imparfait: ["I used to drink", "you used to drink", "he/she used to drink", "we used to drink", "you used to drink", "they used to drink"],
+      futur: ["I will drink", "you will drink", "he/she will drink", "we will drink", "you will drink", "they will drink"],
+    },
+    présent: ["bois", "bois", "boit", "buvons", "buvez", "boivent"],
+    "passé composé": ["ai bu", "as bu", "a bu", "avons bu", "avez bu", "ont bu"],
+    imparfait: ["buvais", "buvais", "buvait", "buvions", "buviez", "buvaient"],
+    futur: ["boirai", "boiras", "boira", "boirons", "boirez", "boiront"],
+  },
+  vivre: {
+    english: "to live",
+    english_conj: {
+      présent: ["I live", "you live", "he/she lives", "we live", "you live", "they live"],
+      "passé composé": ["I lived", "you lived", "he/she lived", "we lived", "you lived", "they lived"],
+      imparfait: ["I used to live", "you used to live", "he/she used to live", "we used to live", "you used to live", "they used to live"],
+      futur: ["I will live", "you will live", "he/she will live", "we will live", "you will live", "they will live"],
+    },
+    présent: ["vis", "vis", "vit", "vivons", "vivez", "vivent"],
+    "passé composé": ["ai vécu", "as vécu", "a vécu", "avons vécu", "avez vécu", "ont vécu"],
+    imparfait: ["vivais", "vivais", "vivait", "vivions", "viviez", "vivaient"],
+    futur: ["vivrai", "vivras", "vivra", "vivrons", "vivrez", "vivront"],
+  },
 };
 
 const TENSES = ["présent", "passé composé", "imparfait", "futur"];
@@ -210,7 +444,7 @@ const TENSE_COLORS = {
 
 const VERB_GROUPS = {
   "-er": {
-    verbs: ["parler", "manger", "aimer"],
+    verbs: ["parler", "manger", "aimer", "donner", "trouver", "penser"],
     label: "-er verbs",
     guide: {
       présent: "Drop the -er, then add: -e, -es, -e, -ons, -ez, -ent. The je/tu/il and ils forms all sound the same — the endings are silent.",
@@ -220,8 +454,8 @@ const VERB_GROUPS = {
     },
   },
   "-ir": {
-    verbs: ["finir"],
-    label: "-ir verbs (regular)",
+    verbs: ["finir", "choisir", "dormir", "sortir", "partir"],
+    label: "-ir verbs",
     guide: {
       présent: "Drop the -ir, then add: -is, -is, -it, -issons, -issez, -issent. Notice the -iss- that appears in the plural forms — it's the hallmark of regular -ir verbs.",
       "passé composé": "Use avoir + past participle. Replace -ir with -i (finir → fini).",
@@ -230,8 +464,8 @@ const VERB_GROUPS = {
     },
   },
   "-re": {
-    verbs: ["vendre"],
-    label: "-re verbs (regular)",
+    verbs: ["vendre", "attendre", "répondre"],
+    label: "-re verbs",
     guide: {
       présent: "Drop the -re, then add: -s, -s, (nothing), -ons, -ez, -ent. Notice il/elle has no ending at all — just the bare stem.",
       "passé composé": "Use avoir + past participle. Replace -re with -u (vendre → vendu).",
@@ -240,7 +474,7 @@ const VERB_GROUPS = {
     },
   },
   irregular: {
-    verbs: ["être", "avoir", "aller", "faire", "pouvoir", "vouloir", "venir", "prendre", "savoir", "devoir"],
+    verbs: ["être", "avoir", "aller", "faire", "pouvoir", "vouloir", "venir", "prendre", "savoir", "devoir", "dire", "voir", "croire", "mettre", "lire", "écrire", "connaître", "boire", "vivre"],
     label: "Irregular",
     guide: {
       présent: "Each verb has its own pattern — no shortcut here. Focus on the most common ones first: être, avoir, aller, faire. Many have a stem change between singular and plural (e.g. venir: viens/venons).",
@@ -1027,7 +1261,7 @@ export default function FrenchVerbApp() {
       </div>
 
       {/* Actions */}
-      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 12 }}>
+      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
         {filledCount > 0 && instantMode && (() => {
           const data = VERBS[verb];
           let correct = 0;
@@ -1045,6 +1279,45 @@ export default function FrenchVerbApp() {
             }}>
               {correct}/{filledCount}
               {filledCount === 24 && correct === 24 && " 🎉"}
+            </div>
+          );
+        })()}
+        {!instantMode && !checked && (
+          <button
+            onClick={handleCheck}
+            disabled={filledCount < 24}
+            style={{
+              fontSize: 15,
+              fontWeight: 700,
+              color: "#fff",
+              background: filledCount < 24 ? "#475569" : "#4338CA",
+              border: "none",
+              borderRadius: 10,
+              padding: "12px 32px",
+              cursor: filledCount < 24 ? "not-allowed" : "pointer",
+              transition: "background 0.15s",
+            }}
+          >
+            Check answers ({filledCount}/24)
+          </button>
+        )}
+        {!instantMode && checked && (() => {
+          const data = VERBS[verb];
+          let correct = 0;
+          TENSES.forEach((tense) => {
+            PRONOUNS.forEach((_, i) => {
+              const p = placements[`${tense}--${i}`];
+              if (p && p.text === data[tense][i]) correct++;
+            });
+          });
+          return (
+            <div style={{
+              fontSize: 18,
+              fontWeight: 700,
+              color: correct === 24 ? "#15803D" : correct >= 18 ? "#B45309" : "#B91C1C",
+            }}>
+              {correct}/24
+              {correct === 24 && " 🎉"}
             </div>
           );
         })()}
