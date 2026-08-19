@@ -509,20 +509,47 @@ function shuffle(arr) {
   return a;
 }
 
-function makeChips(verb) {
+function englishVerbOnly(verb, tense, i) {
+  const full = VERBS[verb].english_conj[tense][i];
+  const pronoun = ENGLISH_PRONOUNS[i];
+  return full.startsWith(`${pronoun} `) ? full.slice(pronoun.length + 1) : full;
+}
+
+// 'normal': French pronoun label, drag the French verb.
+// 'en-sentence': English sentence label, drag the French pronoun + French verb.
+// 'fr-sentence': French sentence label, drag the English pronoun + English verb.
+const MODES = [
+  { key: "normal", label: "French pronouns" },
+  { key: "en-sentence", label: "English sentence" },
+  { key: "fr-sentence", label: "French sentence" },
+];
+
+function makeChips(verb, mode) {
   const data = VERBS[verb];
-  let allChips = [];
+  const verbChips = [];
   TENSES.forEach((tense) => {
-    PRONOUNS.forEach((pronoun, i) => {
-      allChips.push({
-        id: `${tense}--${i}`,
-        text: data[tense][i],
+    PRONOUNS.forEach((_, i) => {
+      const key = `${tense}--${i}`;
+      verbChips.push({
+        id: key,
+        text: mode === "fr-sentence" ? englishVerbOnly(verb, tense, i) : data[tense][i],
         tense,
         pronounIdx: i,
       });
     });
   });
-  return shuffle(allChips);
+
+  // Pronouns aren't tense-specific, so they're a reusable pool of 6 rather than
+  // one chip per (tense, pronoun) slot — the same "tu" chip answers all 4 tenses.
+  let pronounChips = [];
+  if (mode === "en-sentence") {
+    pronounChips = PRONOUNS.map((p, i) => ({ id: `pronoun-${i}`, text: p, pronounIdx: i }));
+  } else if (mode === "fr-sentence") {
+    pronounChips = PRONOUNS.map((_, i) => ({ id: `pronoun-${i}`, text: ENGLISH_PRONOUNS[i], pronounIdx: i }));
+  }
+
+  // Pronoun order stays fixed (je, tu, il/elle, nous, vous, ils/elles) since it's a reference pool, not a puzzle.
+  return { pronounChips, verbChips: shuffle(verbChips) };
 }
 
 function DropSlot({ tense, pronounIdx, placed, onDrop, onRemove, checked, correct, dragOver, onDragOver, onDragLeave }) {
@@ -676,11 +703,199 @@ function Quadrant({ tense, verb, placements, onDrop, onRemove, checked, correcti
   );
 }
 
+function AnswerCell({ kind, tense, i, placed, isCorrect, isWrong, isDragOver, canTap, checked, colors, onDrop, onRemove, onSlotTap, onDragOver, onDragLeave }) {
+  return (
+    <div
+      data-slot={`${tense}|${i}`}
+      data-kind={kind}
+      onClick={() => {
+        if (canTap) onSlotTap(kind, tense, i);
+        else if (placed && !checked) onRemove(kind, tense, i);
+      }}
+      onDragOver={(e) => { e.preventDefault(); onDragOver(); }}
+      onDragLeave={onDragLeave}
+      onDrop={(e) => {
+        e.preventDefault();
+        onDragLeave();
+        try {
+          const { kind: droppedKind, ...chip } = JSON.parse(e.dataTransfer.getData("text/plain"));
+          if (droppedKind === kind) onDrop(kind, tense, i, chip);
+        } catch {}
+      }}
+      style={{
+        flex: 1,
+        minHeight: 34,
+        borderRadius: 6,
+        border: isDragOver
+          ? `2px dashed ${colors.border}`
+          : canTap
+            ? `2px dashed ${colors.border}88`
+            : placed
+              ? isCorrect
+                ? "2px solid #22C55E"
+                : isWrong
+                  ? "2px solid #EF4444"
+                  : `1.5px solid ${colors.border}88`
+              : "1.5px dashed #CBD5E1",
+        background: placed
+          ? isCorrect ? "#F0FDF4" : isWrong ? "#FEF2F2" : "#fff"
+          : isDragOver || canTap ? colors.bg : "#FAFBFC",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        transition: "all 0.15s ease",
+        cursor: canTap ? "pointer" : placed && !checked ? "pointer" : "default",
+      }}
+      title={placed && !checked ? "Click to remove" : canTap ? "Tap to place" : ""}
+    >
+      {placed ? (
+        <span style={{
+          fontSize: 14,
+          fontWeight: 500,
+          color: isCorrect ? "#15803D" : isWrong ? "#B91C1C" : "#1E293B",
+          padding: "4px 8px",
+        }}>
+          {placed.text}
+          {isWrong && <span style={{ fontSize: 11, color: "#EF4444", marginLeft: 6 }}>✕</span>}
+          {isCorrect && <span style={{ fontSize: 11, color: "#22C55E", marginLeft: 6 }}>✓</span>}
+        </span>
+      ) : (
+        <span style={{ fontSize: 12, color: "#CBD5E1" }}>—</span>
+      )}
+    </div>
+  );
+}
+
+const PRONOUN_CHIP_COLORS = { border: "#6366F1", bg: "#EEF2FF", head: "#4338CA" };
+
+function ChipTray({ label, chips, kind, selectedChip, dragging, checked, tenseFilter, setTenseFilter, onDragStart, onDragEnd, onChipTap }) {
+  // Pronoun chips are a reusable pool (no tense of their own), so they ignore the tense filter.
+  const reusable = kind === "pronoun";
+  const filtered = reusable ? chips : chips.filter((c) => !tenseFilter || c.tense === tenseFilter);
+  return (
+    <div style={{
+      background: "#152038",
+      borderRadius: 12,
+      border: "1.5px solid #2D3F5F",
+      padding: "14px 16px",
+      marginBottom: 16,
+    }}>
+      <div style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        marginBottom: 10,
+        flexWrap: "wrap",
+        gap: 8,
+      }}>
+        <span style={{
+          fontSize: 11,
+          fontWeight: 600,
+          textTransform: "uppercase",
+          letterSpacing: "0.06em",
+          color: "#7B8DB0",
+        }}>
+          {label}{reusable ? " (reusable)" : ` (${chips.length} remaining)`}
+        </span>
+        {!reusable && (
+          <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
+            <button
+              onClick={() => setTenseFilter(null)}
+              style={{
+                fontSize: 11,
+                fontWeight: 600,
+                padding: "3px 10px",
+                borderRadius: 5,
+                border: "1.5px solid #2D3F5F",
+                background: tenseFilter === null ? "#1E293B" : "transparent",
+                color: tenseFilter === null ? "#fff" : "#7B8DB0",
+                cursor: "pointer",
+              }}
+            >
+              All
+            </button>
+            {TENSES.map((t) => {
+              const c = TENSE_COLORS[t];
+              const active = tenseFilter === t;
+              return (
+                <button
+                  key={t}
+                  onClick={() => setTenseFilter(active ? null : t)}
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 600,
+                    padding: "3px 10px",
+                    borderRadius: 5,
+                    border: `1.5px solid ${active ? c.border : "#2D3F5F"}`,
+                    background: active ? c.bg : "transparent",
+                    color: active ? c.head : "#7B8DB0",
+                    cursor: "pointer",
+                  }}
+                >
+                  {t}
+                </button>
+              );
+            })}
+          </div>
+        )}
+      </div>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 6, minHeight: 36 }}>
+        {!reusable && chips.length === 0 && !checked && (
+          <span style={{ fontSize: 13, color: "#7B8DB0", fontStyle: "italic" }}>
+            All placed — check your answers below
+          </span>
+        )}
+        {!reusable && filtered.length === 0 && chips.length > 0 && (
+          <span style={{ fontSize: 13, color: "#7B8DB0", fontStyle: "italic" }}>
+            No remaining chips for this tense
+          </span>
+        )}
+        {filtered.map((chip) => {
+          const colors = reusable ? PRONOUN_CHIP_COLORS : TENSE_COLORS[chip.tense];
+          const isSelected = selectedChip?.kind === kind && selectedChip?.chip.id === chip.id;
+          const isDragging = dragging?.kind === kind && dragging?.id === chip.id;
+          return (
+            <div
+              key={chip.id}
+              draggable={!checked}
+              onDragStart={(e) => {
+                onDragStart(chip);
+                e.dataTransfer.setData("text/plain", JSON.stringify({ ...chip, kind }));
+              }}
+              onDragEnd={onDragEnd}
+              onClick={() => onChipTap(chip)}
+              style={{
+                fontSize: 13,
+                fontWeight: 500,
+                padding: "5px 12px",
+                borderRadius: 6,
+                background: isSelected ? colors.border : "rgba(255,255,255,0.9)",
+                color: isSelected ? "#fff" : "#1E293B",
+                border: `1.5px solid ${isSelected ? colors.border : "rgba(255,255,255,0.2)"}`,
+                cursor: checked ? "default" : "grab",
+                opacity: isDragging ? 0.4 : 1,
+                transition: "all 0.12s ease",
+                userSelect: "none",
+                boxShadow: isSelected ? `0 0 0 3px ${colors.border}33` : "none",
+              }}
+            >
+              {chip.text}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 export default function FrenchVerbApp() {
   const verbNames = Object.keys(VERBS).sort((a, b) => a.localeCompare(b, 'fr'));
   const [verb, setVerb] = useState(() => verbNames[Math.floor(Math.random() * verbNames.length)]);
-  const [chips, setChips] = useState(() => makeChips(verb));
+  const [mode, setMode] = useState("normal");
+  const [chipSets, setChipSets] = useState(() => makeChips(verb, mode));
+  const { pronounChips, verbChips } = chipSets;
   const [placements, setPlacements] = useState({});
+  const [pronounPlacements, setPronounPlacements] = useState({});
   const [checked, setChecked] = useState(false);
   const [corrections, setCorrections] = useState(null);
   const [score, setScore] = useState(null);
@@ -692,48 +907,50 @@ export default function FrenchVerbApp() {
   const [guideOpen, setGuideOpen] = useState(false);
   const [instantMode, setInstantMode] = useState(true);
   const [showEnglish, setShowEnglish] = useState(false);
-  const [englishPronouns, setEnglishPronouns] = useState(false);
 
   const filteredVerbNames = groupFilter
     ? verbNames.filter((v) => VERB_GROUPS[groupFilter].verbs.includes(v))
     : verbNames;
 
-  const availableChips = chips.filter(
+  const availableVerbChips = verbChips.filter(
     (c) => !Object.values(placements).find((p) => p && p.id === c.id)
   );
 
-  const handleDrop = useCallback((tense, pronounIdx, chip) => {
+  const handleDrop = useCallback((kind, tense, pronounIdx, chip) => {
     if (checked) return;
-    setPlacements((prev) => {
+    const setter = kind === "pronoun" ? setPronounPlacements : setPlacements;
+    setter((prev) => {
       const next = { ...prev };
-      // Remove chip from any other slot
-      Object.keys(next).forEach((k) => {
-        if (next[k] && next[k].id === chip.id) next[k] = null;
-      });
-      // If slot is occupied, free the old chip
+      // Verb chips are single-use — placing one elsewhere frees its old slot.
+      // Pronoun chips are reusable (the same "tu" answers every tense), so they stay put.
+      if (kind !== "pronoun") {
+        Object.keys(next).forEach((k) => {
+          if (next[k] && next[k].id === chip.id) next[k] = null;
+        });
+      }
       const key = `${tense}--${pronounIdx}`;
       next[key] = chip;
       return next;
     });
   }, [checked]);
 
-  const handleRemove = useCallback((tense, pronounIdx) => {
+  const handleRemove = useCallback((kind, tense, pronounIdx) => {
     if (checked) return;
-    setPlacements((prev) => ({ ...prev, [`${tense}--${pronounIdx}`]: null }));
+    const setter = kind === "pronoun" ? setPronounPlacements : setPlacements;
+    setter((prev) => ({ ...prev, [`${tense}--${pronounIdx}`]: null }));
   }, [checked]);
 
   const handleCheck = () => {
-    const data = VERBS[verb];
     let correct = 0;
     let total = 24;
     const corr = {};
     TENSES.forEach((tense) => {
       PRONOUNS.forEach((_, i) => {
         const key = `${tense}--${i}`;
-        const placed = placements[key];
-        const isCorrect = placed && placed.text === data[tense][i];
-        corr[key] = !!isCorrect;
-        if (isCorrect) correct++;
+        const verbOk = !!(placements[key] && placements[key].id === key);
+        const pronounOk = mode === "normal" || !!(pronounPlacements[key] && pronounPlacements[key].pronounIdx === i);
+        corr[key] = { verb: verbOk, pronoun: pronounOk };
+        if (verbOk && pronounOk) correct++;
       });
     });
     setCorrections(corr);
@@ -747,8 +964,9 @@ export default function FrenchVerbApp() {
       : verbNames;
     const chosen = v || pool[Math.floor(Math.random() * pool.length)];
     setVerb(chosen);
-    setChips(makeChips(chosen));
+    setChipSets(makeChips(chosen, mode));
     setPlacements({});
+    setPronounPlacements({});
     setChecked(false);
     setCorrections(null);
     setScore(null);
@@ -769,21 +987,38 @@ export default function FrenchVerbApp() {
 
   const handleNewVerbDirect = (v) => {
     setVerb(v);
-    setChips(makeChips(v));
+    setChipSets(makeChips(v, mode));
     setPlacements({});
+    setPronounPlacements({});
     setChecked(false);
     setCorrections(null);
     setScore(null);
     setTenseFilter(null);
   };
 
-  const filledCount = Object.values(placements).filter(Boolean).length;
+  const handleModeChange = (nextMode) => {
+    if (nextMode === mode) return;
+    setMode(nextMode);
+    setChipSets(makeChips(verb, nextMode));
+    setPlacements({});
+    setPronounPlacements({});
+    setChecked(false);
+    setCorrections(null);
+    setScore(null);
+  };
+
+  const filledCount = TENSES.reduce((acc, tense) => acc + PRONOUNS.reduce((acc2, _, i) => {
+    const key = `${tense}--${i}`;
+    const verbFilled = !!placements[key];
+    const pronounFilled = mode === "normal" || !!pronounPlacements[key];
+    return acc2 + (verbFilled && pronounFilled ? 1 : 0);
+  }, 0), 0);
 
   // Touch handlers for mobile drag
-  const handleTouchStart = (e, chip) => {
+  const handleTouchStart = (e, chip, kind) => {
     e.preventDefault();
     const touch = e.touches[0];
-    setTouchDrag({ chip, x: touch.clientX, y: touch.clientY });
+    setTouchDrag({ chip, kind, x: touch.clientX, y: touch.clientY });
   };
 
   const handleTouchMove = useCallback((e) => {
@@ -802,7 +1037,7 @@ export default function FrenchVerbApp() {
       const slot = el.closest('[data-slot]');
       if (slot) {
         const [tense, idx] = slot.dataset.slot.split('|');
-        handleDrop(tense, parseInt(idx), touchDrag.chip);
+        handleDrop(touchDrag.kind, tense, parseInt(idx), touchDrag.chip);
       }
     }
     setTouchDrag(null);
@@ -823,14 +1058,14 @@ export default function FrenchVerbApp() {
   const [selectedChip, setSelectedChip] = useState(null);
   const [tenseFilter, setTenseFilter] = useState(null);
 
-  const handleChipTap = (chip) => {
+  const handleChipTap = (chip, kind) => {
     if (checked) return;
-    setSelectedChip(prev => prev?.id === chip.id ? null : chip);
+    setSelectedChip(prev => (prev?.kind === kind && prev?.chip.id === chip.id) ? null : { chip, kind });
   };
 
-  const handleSlotTap = (tense, pronounIdx) => {
-    if (checked || !selectedChip) return;
-    handleDrop(tense, pronounIdx, selectedChip);
+  const handleSlotTap = (kind, tense, pronounIdx) => {
+    if (checked || !selectedChip || selectedChip.kind !== kind) return;
+    handleDrop(kind, tense, pronounIdx, selectedChip.chip);
     setSelectedChip(null);
   };
 
@@ -940,47 +1175,39 @@ export default function FrenchVerbApp() {
           </span>
           Show English
         </button>
-        <button
-          onClick={() => setEnglishPronouns(!englishPronouns)}
-          style={{
-            marginTop: 10,
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 8,
-            fontSize: 13,
-            fontWeight: 600,
-            color: englishPronouns ? "#B45309" : "#8B9CC0",
-            background: englishPronouns ? "#FFFBEB" : "rgba(255,255,255,0.06)",
-            border: `1.5px solid ${englishPronouns ? "#F59E0B" : "#3D4F6F"}`,
-            borderRadius: 20,
-            padding: "6px 16px",
-            cursor: "pointer",
-            transition: "all 0.15s",
-          }}
-        >
-          <span style={{
-            width: 32,
-            height: 18,
-            borderRadius: 9,
-            background: englishPronouns ? "#F59E0B" : "#CBD5E1",
-            position: "relative",
-            display: "inline-block",
-            transition: "background 0.2s",
-          }}>
-            <span style={{
-              position: "absolute",
-              top: 2,
-              left: englishPronouns ? 16 : 2,
-              width: 14,
-              height: 14,
-              borderRadius: "50%",
-              background: "#fff",
-              transition: "left 0.2s",
-              boxShadow: "0 1px 2px rgba(0,0,0,0.15)",
-            }} />
-          </span>
-          English pronouns
-        </button>
+        <div style={{
+          marginTop: 10,
+          display: "inline-flex",
+          gap: 3,
+          padding: 3,
+          background: "rgba(255,255,255,0.06)",
+          border: "1.5px solid #3D4F6F",
+          borderRadius: 20,
+          verticalAlign: "middle",
+        }}>
+          {MODES.map((m) => {
+            const active = mode === m.key;
+            return (
+              <button
+                key={m.key}
+                onClick={() => handleModeChange(m.key)}
+                style={{
+                  fontSize: 12,
+                  fontWeight: 600,
+                  padding: "5px 12px",
+                  borderRadius: 16,
+                  border: "none",
+                  background: active ? "#F59E0B" : "transparent",
+                  color: active ? "#1B2A4A" : "#8B9CC0",
+                  cursor: "pointer",
+                  transition: "all 0.15s",
+                }}
+              >
+                {m.label}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {/* Verb group filter */}
@@ -1179,6 +1406,7 @@ export default function FrenchVerbApp() {
               tense={tense}
               verb={verb}
               placements={placements}
+              pronounPlacements={pronounPlacements}
               onDrop={handleDrop}
               onRemove={handleRemove}
               checked={checked}
@@ -1187,132 +1415,52 @@ export default function FrenchVerbApp() {
               onSlotTap={handleSlotTap}
               instantMode={instantMode}
               showEnglish={showEnglish}
-              englishPronouns={englishPronouns}
+              mode={mode}
             />
           </div>
         ))}
       </div>
 
-      {/* Chip tray */}
-      <div style={{
-        background: "#152038",
-        borderRadius: 12,
-        border: "1.5px solid #2D3F5F",
-        padding: "14px 16px",
-        marginBottom: 16,
-      }}>
-        <div style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          marginBottom: 10,
-          flexWrap: "wrap",
-          gap: 8,
-        }}>
-          <span style={{
-            fontSize: 11,
-            fontWeight: 600,
-            textTransform: "uppercase",
-            letterSpacing: "0.06em",
-            color: "#7B8DB0",
-          }}>
-            Conjugations ({availableChips.length} remaining)
-          </span>
-          <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
-            <button
-              onClick={() => setTenseFilter(null)}
-              style={{
-                fontSize: 11,
-                fontWeight: 600,
-                padding: "3px 10px",
-                borderRadius: 5,
-                border: "1.5px solid #2D3F5F",
-                background: tenseFilter === null ? "#1E293B" : "transparent",
-                color: tenseFilter === null ? "#fff" : "#7B8DB0",
-                cursor: "pointer",
-              }}
-            >
-              All
-            </button>
-            {TENSES.map((t) => {
-              const c = TENSE_COLORS[t];
-              const active = tenseFilter === t;
-              return (
-                <button
-                  key={t}
-                  onClick={() => setTenseFilter(active ? null : t)}
-                  style={{
-                    fontSize: 11,
-                    fontWeight: 600,
-                    padding: "3px 10px",
-                    borderRadius: 5,
-                    border: `1.5px solid ${active ? c.border : "#2D3F5F"}`,
-                    background: active ? c.bg : "transparent",
-                    color: active ? c.head : "#7B8DB0",
-                    cursor: "pointer",
-                  }}
-                >
-                  {t}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 6, minHeight: 36 }}>
-          {availableChips.length === 0 && !checked && (
-            <span style={{ fontSize: 13, color: "#7B8DB0", fontStyle: "italic" }}>
-              All placed — check your answers below
-            </span>
-          )}
-          {availableChips.filter(c => !tenseFilter || c.tense === tenseFilter).length === 0 && availableChips.length > 0 && (
-            <span style={{ fontSize: 13, color: "#7B8DB0", fontStyle: "italic" }}>
-              No remaining chips for this tense
-            </span>
-          )}
-          {availableChips.filter(c => !tenseFilter || c.tense === tenseFilter).map((chip) => {
-            const colors = TENSE_COLORS[chip.tense];
-            const isSelected = selectedChip?.id === chip.id;
-            return (
-              <div
-                key={chip.id}
-                draggable={!checked}
-                onDragStart={(e) => {
-                  setDragging(chip.id);
-                  e.dataTransfer.setData("text/plain", JSON.stringify(chip));
-                }}
-                onDragEnd={() => setDragging(null)}
-                onClick={() => handleChipTap(chip)}
-                style={{
-                  fontSize: 13,
-                  fontWeight: 500,
-                  padding: "5px 12px",
-                  borderRadius: 6,
-                  background: isSelected ? colors.border : "rgba(255,255,255,0.9)",
-                  color: isSelected ? "#fff" : "#1E293B",
-                  border: `1.5px solid ${isSelected ? colors.border : "rgba(255,255,255,0.2)"}`,
-                  cursor: checked ? "default" : "grab",
-                  opacity: dragging === chip.id ? 0.4 : 1,
-                  transition: "all 0.12s ease",
-                  userSelect: "none",
-                  boxShadow: isSelected ? `0 0 0 3px ${colors.border}33` : "none",
-                }}
-              >
-                {chip.text}
-              </div>
-            );
-          })}
-        </div>
-      </div>
+      {/* Chip trays */}
+      {mode !== "normal" && (
+        <ChipTray
+          label={mode === "fr-sentence" ? "English pronouns" : "French pronouns"}
+          chips={pronounChips}
+          kind="pronoun"
+          selectedChip={selectedChip}
+          dragging={dragging}
+          checked={checked}
+          tenseFilter={tenseFilter}
+          setTenseFilter={setTenseFilter}
+          onDragStart={(chip) => setDragging({ kind: "pronoun", id: chip.id })}
+          onDragEnd={() => setDragging(null)}
+          onChipTap={(chip) => handleChipTap(chip, "pronoun")}
+        />
+      )}
+      <ChipTray
+        label={mode === "normal" ? "Conjugations" : mode === "fr-sentence" ? "English verbs" : "French verbs"}
+        chips={availableVerbChips}
+        kind="verb"
+        selectedChip={selectedChip}
+        dragging={dragging}
+        checked={checked}
+        tenseFilter={tenseFilter}
+        setTenseFilter={setTenseFilter}
+        onDragStart={(chip) => setDragging({ kind: "verb", id: chip.id })}
+        onDragEnd={() => setDragging(null)}
+        onChipTap={(chip) => handleChipTap(chip, "verb")}
+      />
 
       {/* Actions */}
       <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
         {filledCount > 0 && instantMode && (() => {
-          const data = VERBS[verb];
           let correct = 0;
           TENSES.forEach((tense) => {
             PRONOUNS.forEach((_, i) => {
-              const p = placements[`${tense}--${i}`];
-              if (p && p.text === data[tense][i]) correct++;
+              const key = `${tense}--${i}`;
+              const verbOk = placements[key] && placements[key].id === key;
+              const pronounOk = mode === "normal" || (pronounPlacements[key] && pronounPlacements[key].pronounIdx === i);
+              if (verbOk && pronounOk) correct++;
             });
           });
           return (
@@ -1346,12 +1494,13 @@ export default function FrenchVerbApp() {
           </button>
         )}
         {!instantMode && checked && (() => {
-          const data = VERBS[verb];
           let correct = 0;
           TENSES.forEach((tense) => {
             PRONOUNS.forEach((_, i) => {
-              const p = placements[`${tense}--${i}`];
-              if (p && p.text === data[tense][i]) correct++;
+              const key = `${tense}--${i}`;
+              const verbOk = placements[key] && placements[key].id === key;
+              const pronounOk = mode === "normal" || (pronounPlacements[key] && pronounPlacements[key].pronounIdx === i);
+              if (verbOk && pronounOk) correct++;
             });
           });
           return (
@@ -1386,10 +1535,11 @@ export default function FrenchVerbApp() {
 }
 
 // Quadrant variant that supports tap-to-place
-function QuadrantWithSlotTap({ tense, verb, placements, onDrop, onRemove, checked, corrections, selectedChip, onSlotTap, instantMode, showEnglish, englishPronouns }) {
+function QuadrantWithSlotTap({ tense, verb, placements, pronounPlacements, onDrop, onRemove, checked, corrections, selectedChip, onSlotTap, instantMode, showEnglish, mode }) {
   const colors = TENSE_COLORS[tense];
   const [dragOverSlot, setDragOverSlot] = useState(null);
   const data = VERBS[verb];
+  const twoBox = mode !== "normal";
 
   return (
     <div style={{
@@ -1420,50 +1570,42 @@ function QuadrantWithSlotTap({ tense, verb, placements, onDrop, onRemove, checke
       </div>
       <div style={{ padding: "6px 14px 10px" }}>
         {PRONOUNS.map((_, i) => {
-          const pronoun = englishPronouns ? ENGLISH_PRONOUNS[i] : PRONOUNS[i];
+          const rowLabel = mode === "en-sentence" ? data.english_conj[tense][i]
+            : mode === "fr-sentence" ? `${PRONOUNS[i]} ${data[tense][i]}`
+            : PRONOUNS[i];
           const key = `${tense}--${i}`;
-          const placed = placements[key] || null;
 
-          // Instant mode: check correctness as soon as placed
-          const instantCorrect = instantMode && placed && placed.text === data[tense][i];
-          const instantWrong = instantMode && placed && placed.text !== data[tense][i];
+          const verbPlaced = placements[key] || null;
+          const verbInstantCorrect = instantMode && verbPlaced && verbPlaced.id === key;
+          const verbInstantWrong = instantMode && verbPlaced && verbPlaced.id !== key;
+          const verbCheckedCorrect = checked && corrections && corrections[key]?.verb;
+          const verbCheckedWrong = checked && corrections && corrections[key] && !corrections[key].verb && verbPlaced;
+          const verbCorrect = verbInstantCorrect || verbCheckedCorrect;
+          const verbWrong = verbInstantWrong || verbCheckedWrong;
+          const verbCanTap = !checked && selectedChip?.kind === "verb" && !verbPlaced;
 
-          // Checked mode (end-of-round)
-          const checkedCorrect = checked && corrections && corrections[key];
-          const checkedWrong = checked && corrections && !corrections[key] && placed;
-
-          const isCorrect = instantCorrect || checkedCorrect;
-          const isWrong = instantWrong || checkedWrong;
-
-          const isDragOver = dragOverSlot === i;
-          const canTap = !checked && selectedChip && !placed;
+          const pronounPlaced = twoBox ? (pronounPlacements[key] || null) : null;
+          const pronounInstantCorrect = twoBox && instantMode && pronounPlaced && pronounPlaced.pronounIdx === i;
+          const pronounInstantWrong = twoBox && instantMode && pronounPlaced && pronounPlaced.pronounIdx !== i;
+          const pronounCheckedCorrect = twoBox && checked && corrections && corrections[key]?.pronoun;
+          const pronounCheckedWrong = twoBox && checked && corrections && corrections[key] && !corrections[key].pronoun && pronounPlaced;
+          const pronounCorrect = pronounInstantCorrect || pronounCheckedCorrect;
+          const pronounWrong = pronounInstantWrong || pronounCheckedWrong;
+          const pronounCanTap = twoBox && !checked && selectedChip?.kind === "pronoun" && !pronounPlaced;
 
           return (
             <div
               key={i}
-              data-slot={`${tense}|${i}`}
-              onClick={() => {
-                if (canTap) onSlotTap(tense, i);
-                else if (placed && !checked) onRemove(tense, i);
-              }}
-              onDragOver={(e) => { e.preventDefault(); setDragOverSlot(i); }}
-              onDragLeave={() => setDragOverSlot(null)}
-              onDrop={(e) => {
-                e.preventDefault();
-                setDragOverSlot(null);
-                try { onDrop(tense, i, JSON.parse(e.dataTransfer.getData("text/plain"))); } catch {}
-              }}
               style={{
                 display: "flex",
                 alignItems: "center",
                 gap: 8,
                 padding: "5px 0",
                 borderBottom: i < 5 ? "1px solid #f0f0f0" : "none",
-                cursor: canTap ? "pointer" : placed && !checked ? "pointer" : "default",
               }}
             >
               <span style={{
-                width: showEnglish ? 'auto' : 72,
+                width: showEnglish || twoBox ? 'auto' : 72,
                 minWidth: 72,
                 fontSize: 13,
                 color: "#64748B",
@@ -1471,8 +1613,8 @@ function QuadrantWithSlotTap({ tense, verb, placements, onDrop, onRemove, checke
                 textAlign: "right",
                 flexShrink: 0,
               }}>
-                {pronoun}
-                {showEnglish && data.english_conj && (
+                {rowLabel}
+                {showEnglish && !twoBox && data.english_conj && (
                   <span style={{
                     fontSize: 11,
                     color: "#94A3B8",
@@ -1483,46 +1625,42 @@ function QuadrantWithSlotTap({ tense, verb, placements, onDrop, onRemove, checke
                   </span>
                 )}
               </span>
-              <div style={{
-                flex: 1,
-                minHeight: 34,
-                borderRadius: 6,
-                border: isDragOver
-                  ? `2px dashed ${colors.border}`
-                  : canTap
-                    ? `2px dashed ${colors.border}88`
-                    : placed
-                      ? isCorrect
-                        ? "2px solid #22C55E"
-                        : isWrong
-                          ? "2px solid #EF4444"
-                          : `1.5px solid ${colors.border}88`
-                      : "1.5px dashed #CBD5E1",
-                background: placed
-                  ? isCorrect ? "#F0FDF4" : isWrong ? "#FEF2F2" : "#fff"
-                  : isDragOver || canTap ? colors.bg : "#FAFBFC",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                transition: "all 0.15s ease",
-              }}
-              title={placed && !checked ? "Click to remove" : canTap ? "Tap to place" : ""}
-              >
-                {placed ? (
-                  <span style={{
-                    fontSize: 14,
-                    fontWeight: 500,
-                    color: isCorrect ? "#15803D" : isWrong ? "#B91C1C" : "#1E293B",
-                    padding: "4px 8px",
-                  }}>
-                    {placed.text}
-                    {isWrong && <span style={{ fontSize: 11, color: "#EF4444", marginLeft: 6 }}>✕</span>}
-                    {isCorrect && <span style={{ fontSize: 11, color: "#22C55E", marginLeft: 6 }}>✓</span>}
-                  </span>
-                ) : (
-                  <span style={{ fontSize: 12, color: "#CBD5E1" }}>—</span>
-                )}
-              </div>
+              {twoBox && (
+                <AnswerCell
+                  kind="pronoun"
+                  tense={tense}
+                  i={i}
+                  placed={pronounPlaced}
+                  isCorrect={pronounCorrect}
+                  isWrong={pronounWrong}
+                  isDragOver={dragOverSlot === `pronoun-${i}`}
+                  canTap={pronounCanTap}
+                  checked={checked}
+                  colors={colors}
+                  onDrop={onDrop}
+                  onRemove={onRemove}
+                  onSlotTap={onSlotTap}
+                  onDragOver={() => setDragOverSlot(`pronoun-${i}`)}
+                  onDragLeave={() => setDragOverSlot(null)}
+                />
+              )}
+              <AnswerCell
+                kind="verb"
+                tense={tense}
+                i={i}
+                placed={verbPlaced}
+                isCorrect={verbCorrect}
+                isWrong={verbWrong}
+                isDragOver={dragOverSlot === `verb-${i}`}
+                canTap={verbCanTap}
+                checked={checked}
+                colors={colors}
+                onDrop={onDrop}
+                onRemove={onRemove}
+                onSlotTap={onSlotTap}
+                onDragOver={() => setDragOverSlot(`verb-${i}`)}
+                onDragLeave={() => setDragOverSlot(null)}
+              />
             </div>
           );
         })}
@@ -1531,11 +1669,17 @@ function QuadrantWithSlotTap({ tense, verb, placements, onDrop, onRemove, checke
         <div style={{ padding: "4px 14px 10px" }}>
           {PRONOUNS.map((_, i) => {
             const key = `${tense}--${i}`;
-            if (corrections[key]) return null;
-            const p = englishPronouns ? ENGLISH_PRONOUNS[i] : PRONOUNS[i];
+            const c = corrections[key];
+            if (c && c.verb && c.pronoun) return null;
+            const label = mode === "en-sentence" ? data.english_conj[tense][i]
+              : mode === "fr-sentence" ? `${PRONOUNS[i]} ${data[tense][i]}`
+              : PRONOUNS[i];
+            const answer = mode === "fr-sentence" ? `${ENGLISH_PRONOUNS[i]} ${englishVerbOnly(verb, tense, i)}`
+              : mode === "en-sentence" ? `${PRONOUNS[i]} ${data[tense][i]}`
+              : data[tense][i];
             return (
               <div key={i} style={{ fontSize: 12, color: "#64748B", lineHeight: 1.6 }}>
-                {p} → <strong style={{ color: colors.head }}>{VERBS[verb][tense][i]}</strong>
+                {label} → <strong style={{ color: colors.head }}>{answer}</strong>
               </div>
             );
           })}
