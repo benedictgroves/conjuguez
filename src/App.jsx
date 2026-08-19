@@ -1,6 +1,7 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 
 const PRONOUNS = ["je", "tu", "il/elle", "nous", "vous", "ils/elles"];
+const ENGLISH_PRONOUNS = ["I", "you", "he/she", "we", "you", "they"];
 
 const VERBS = {
   parler: {
@@ -691,6 +692,7 @@ export default function FrenchVerbApp() {
   const [guideOpen, setGuideOpen] = useState(false);
   const [instantMode, setInstantMode] = useState(true);
   const [showEnglish, setShowEnglish] = useState(false);
+  const [englishPronouns, setEnglishPronouns] = useState(false);
 
   const filteredVerbNames = groupFilter
     ? verbNames.filter((v) => VERB_GROUPS[groupFilter].verbs.includes(v))
@@ -938,6 +940,47 @@ export default function FrenchVerbApp() {
           </span>
           Show English
         </button>
+        <button
+          onClick={() => setEnglishPronouns(!englishPronouns)}
+          style={{
+            marginTop: 10,
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 8,
+            fontSize: 13,
+            fontWeight: 600,
+            color: englishPronouns ? "#B45309" : "#8B9CC0",
+            background: englishPronouns ? "#FFFBEB" : "rgba(255,255,255,0.06)",
+            border: `1.5px solid ${englishPronouns ? "#F59E0B" : "#3D4F6F"}`,
+            borderRadius: 20,
+            padding: "6px 16px",
+            cursor: "pointer",
+            transition: "all 0.15s",
+          }}
+        >
+          <span style={{
+            width: 32,
+            height: 18,
+            borderRadius: 9,
+            background: englishPronouns ? "#F59E0B" : "#CBD5E1",
+            position: "relative",
+            display: "inline-block",
+            transition: "background 0.2s",
+          }}>
+            <span style={{
+              position: "absolute",
+              top: 2,
+              left: englishPronouns ? 16 : 2,
+              width: 14,
+              height: 14,
+              borderRadius: "50%",
+              background: "#fff",
+              transition: "left 0.2s",
+              boxShadow: "0 1px 2px rgba(0,0,0,0.15)",
+            }} />
+          </span>
+          English pronouns
+        </button>
       </div>
 
       {/* Verb group filter */}
@@ -1144,6 +1187,7 @@ export default function FrenchVerbApp() {
               onSlotTap={handleSlotTap}
               instantMode={instantMode}
               showEnglish={showEnglish}
+              englishPronouns={englishPronouns}
             />
           </div>
         ))}
@@ -1342,7 +1386,7 @@ export default function FrenchVerbApp() {
 }
 
 // Quadrant variant that supports tap-to-place
-function QuadrantWithSlotTap({ tense, verb, placements, onDrop, onRemove, checked, corrections, selectedChip, onSlotTap, instantMode, showEnglish }) {
+function QuadrantWithSlotTap({ tense, verb, placements, onDrop, onRemove, checked, corrections, selectedChip, onSlotTap, instantMode, showEnglish, englishPronouns }) {
   const colors = TENSE_COLORS[tense];
   const [dragOverSlot, setDragOverSlot] = useState(null);
   const data = VERBS[verb];
@@ -1375,7 +1419,8 @@ function QuadrantWithSlotTap({ tense, verb, placements, onDrop, onRemove, checke
         </span>
       </div>
       <div style={{ padding: "6px 14px 10px" }}>
-        {PRONOUNS.map((pronoun, i) => {
+        {PRONOUNS.map((_, i) => {
+          const pronoun = englishPronouns ? ENGLISH_PRONOUNS[i] : PRONOUNS[i];
           const key = `${tense}--${i}`;
           const placed = placements[key] || null;
 
@@ -1484,9 +1529,10 @@ function QuadrantWithSlotTap({ tense, verb, placements, onDrop, onRemove, checke
       </div>
       {checked && corrections && (
         <div style={{ padding: "4px 14px 10px" }}>
-          {PRONOUNS.map((p, i) => {
+          {PRONOUNS.map((_, i) => {
             const key = `${tense}--${i}`;
             if (corrections[key]) return null;
+            const p = englishPronouns ? ENGLISH_PRONOUNS[i] : PRONOUNS[i];
             return (
               <div key={i} style={{ fontSize: 12, color: "#64748B", lineHeight: 1.6 }}>
                 {p} → <strong style={{ color: colors.head }}>{VERBS[verb][tense][i]}</strong>
