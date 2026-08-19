@@ -500,15 +500,6 @@ const GROUP_COLORS = {
   irregular: { bg: "#FFF1F2", border: "#E11D48", head: "#BE123C" },
 };
 
-function shuffle(arr) {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
-
 function englishVerbOnly(verb, tense, i) {
   const full = VERBS[verb].english_conj[tense][i];
   const pronoun = ENGLISH_PRONOUNS[i];
@@ -549,7 +540,8 @@ function makeChips(verb, mode) {
   }
 
   // Pronoun order stays fixed (je, tu, il/elle, nous, vous, ils/elles) since it's a reference pool, not a puzzle.
-  return { pronounChips, verbChips: shuffle(verbChips) };
+  verbChips.sort((a, b) => a.text.localeCompare(b.text, "fr"));
+  return { pronounChips, verbChips };
 }
 
 function DropSlot({ tense, pronounIdx, placed, onDrop, onRemove, checked, correct, dragOver, onDragOver, onDragLeave }) {
