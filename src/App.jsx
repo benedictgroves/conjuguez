@@ -530,18 +530,9 @@ function makeChips(verb, mode) {
     });
   });
 
-  // Pronouns aren't tense-specific, so they're a reusable pool of 6 rather than
-  // one chip per (tense, pronoun) slot — the same "tu" chip answers all 4 tenses.
-  let pronounChips = [];
-  if (mode === "en-sentence") {
-    pronounChips = PRONOUNS.map((p, i) => ({ id: `pronoun-${i}`, text: p, pronounIdx: i }));
-  } else if (mode === "fr-sentence") {
-    pronounChips = PRONOUNS.map((_, i) => ({ id: `pronoun-${i}`, text: ENGLISH_PRONOUNS[i], pronounIdx: i }));
-  }
-
   // Pronoun order stays fixed (je, tu, il/elle, nous, vous, ils/elles) since it's a reference pool, not a puzzle.
   verbChips.sort((a, b) => a.text.localeCompare(b.text, "fr"));
-  return { pronounChips, verbChips };
+  return { verbChips };
 }
 
 function DropSlot({ tense, pronounIdx, placed, onDrop, onRemove, checked, correct, dragOver, onDragOver, onDragLeave }) {
@@ -758,12 +749,8 @@ function AnswerCell({ kind, tense, i, placed, isCorrect, isWrong, isDragOver, ca
   );
 }
 
-const PRONOUN_CHIP_COLORS = { border: "#6366F1", bg: "#EEF2FF", head: "#4338CA" };
-
 function ChipTray({ label, chips, kind, selectedChip, dragging, checked, tenseFilter, setTenseFilter, onDragStart, onDragEnd, onChipTap }) {
-  // Pronoun chips are a reusable pool (no tense of their own), so they ignore the tense filter.
-  const reusable = kind === "pronoun";
-  const filtered = reusable ? chips : chips.filter((c) => !tenseFilter || c.tense === tenseFilter);
+  const filtered = chips.filter((c) => !tenseFilter || c.tense === tenseFilter);
   return (
     <div style={{
       background: "#152038",
@@ -787,10 +774,9 @@ function ChipTray({ label, chips, kind, selectedChip, dragging, checked, tenseFi
           letterSpacing: "0.06em",
           color: "#7B8DB0",
         }}>
-          {label}{reusable ? " (reusable)" : ` (${chips.length} remaining)`}
+          {label} ({chips.length} remaining)
         </span>
-        {!reusable && (
-          <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
+        <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
             <button
               onClick={() => setTenseFilter(null)}
               style={{
@@ -829,21 +815,20 @@ function ChipTray({ label, chips, kind, selectedChip, dragging, checked, tenseFi
               );
             })}
           </div>
-        )}
       </div>
       <div style={{ display: "flex", flexWrap: "wrap", gap: 6, minHeight: 36 }}>
-        {!reusable && chips.length === 0 && !checked && (
+        {chips.length === 0 && !checked && (
           <span style={{ fontSize: 13, color: "#7B8DB0", fontStyle: "italic" }}>
             All placed — check your answers below
           </span>
         )}
-        {!reusable && filtered.length === 0 && chips.length > 0 && (
+        {filtered.length === 0 && chips.length > 0 && (
           <span style={{ fontSize: 13, color: "#7B8DB0", fontStyle: "italic" }}>
             No remaining chips for this tense
           </span>
         )}
         {filtered.map((chip) => {
-          const colors = reusable ? PRONOUN_CHIP_COLORS : TENSE_COLORS[chip.tense];
+          const colors = TENSE_COLORS[chip.tense];
           const isSelected = selectedChip?.kind === kind && selectedChip?.chip.id === chip.id;
           const isDragging = dragging?.kind === kind && dragging?.id === chip.id;
           return (
@@ -885,9 +870,8 @@ export default function FrenchVerbApp() {
   const [verb, setVerb] = useState(() => verbNames[Math.floor(Math.random() * verbNames.length)]);
   const [mode, setMode] = useState("normal");
   const [chipSets, setChipSets] = useState(() => makeChips(verb, mode));
-  const { pronounChips, verbChips } = chipSets;
+  const { verbChips } = chipSets;
   const [placements, setPlacements] = useState({});
-  const [pronounPlacements, setPronounPlacements] = useState({});
   const [checked, setChecked] = useState(false);
   const [corrections, setCorrections] = useState(null);
   const [score, setScore] = useState(null);
@@ -910,16 +894,12 @@ export default function FrenchVerbApp() {
 
   const handleDrop = useCallback((kind, tense, pronounIdx, chip) => {
     if (checked) return;
-    const setter = kind === "pronoun" ? setPronounPlacements : setPlacements;
-    setter((prev) => {
+    setPlacements((prev) => {
       const next = { ...prev };
       // Verb chips are single-use — placing one elsewhere frees its old slot.
-      // Pronoun chips are reusable (the same "tu" answers every tense), so they stay put.
-      if (kind !== "pronoun") {
-        Object.keys(next).forEach((k) => {
-          if (next[k] && next[k].id === chip.id) next[k] = null;
-        });
-      }
+      Object.keys(next).forEach((k) => {
+        if (next[k] && next[k].id === chip.id) next[k] = null;
+      });
       const key = `${tense}--${pronounIdx}`;
       next[key] = chip;
       return next;
@@ -928,8 +908,7 @@ export default function FrenchVerbApp() {
 
   const handleRemove = useCallback((kind, tense, pronounIdx) => {
     if (checked) return;
-    const setter = kind === "pronoun" ? setPronounPlacements : setPlacements;
-    setter((prev) => ({ ...prev, [`${tense}--${pronounIdx}`]: null }));
+    setPlacements((prev) => ({ ...prev, [`${tense}--${pronounIdx}`]: null }));
   }, [checked]);
 
   const handleCheck = () => {
@@ -940,9 +919,8 @@ export default function FrenchVerbApp() {
       PRONOUNS.forEach((_, i) => {
         const key = `${tense}--${i}`;
         const verbOk = !!(placements[key] && placements[key].id === key);
-        const pronounOk = mode === "normal" || !!(pronounPlacements[key] && pronounPlacements[key].pronounIdx === i);
-        corr[key] = { verb: verbOk, pronoun: pronounOk };
-        if (verbOk && pronounOk) correct++;
+        corr[key] = { verb: verbOk };
+        if (verbOk) correct++;
       });
     });
     setCorrections(corr);
@@ -958,7 +936,6 @@ export default function FrenchVerbApp() {
     setVerb(chosen);
     setChipSets(makeChips(chosen, mode));
     setPlacements({});
-    setPronounPlacements({});
     setChecked(false);
     setCorrections(null);
     setScore(null);
@@ -981,7 +958,6 @@ export default function FrenchVerbApp() {
     setVerb(v);
     setChipSets(makeChips(v, mode));
     setPlacements({});
-    setPronounPlacements({});
     setChecked(false);
     setCorrections(null);
     setScore(null);
@@ -993,7 +969,6 @@ export default function FrenchVerbApp() {
     setMode(nextMode);
     setChipSets(makeChips(verb, nextMode));
     setPlacements({});
-    setPronounPlacements({});
     setChecked(false);
     setCorrections(null);
     setScore(null);
@@ -1001,9 +976,7 @@ export default function FrenchVerbApp() {
 
   const filledCount = TENSES.reduce((acc, tense) => acc + PRONOUNS.reduce((acc2, _, i) => {
     const key = `${tense}--${i}`;
-    const verbFilled = !!placements[key];
-    const pronounFilled = mode === "normal" || !!pronounPlacements[key];
-    return acc2 + (verbFilled && pronounFilled ? 1 : 0);
+    return acc2 + (placements[key] ? 1 : 0);
   }, 0), 0);
 
   // Touch handlers for mobile drag
@@ -1398,7 +1371,6 @@ export default function FrenchVerbApp() {
               tense={tense}
               verb={verb}
               placements={placements}
-              pronounPlacements={pronounPlacements}
               onDrop={handleDrop}
               onRemove={handleRemove}
               checked={checked}
@@ -1413,22 +1385,7 @@ export default function FrenchVerbApp() {
         ))}
       </div>
 
-      {/* Chip trays */}
-      {mode !== "normal" && (
-        <ChipTray
-          label={mode === "fr-sentence" ? "English pronouns" : "French pronouns"}
-          chips={pronounChips}
-          kind="pronoun"
-          selectedChip={selectedChip}
-          dragging={dragging}
-          checked={checked}
-          tenseFilter={tenseFilter}
-          setTenseFilter={setTenseFilter}
-          onDragStart={(chip) => setDragging({ kind: "pronoun", id: chip.id })}
-          onDragEnd={() => setDragging(null)}
-          onChipTap={(chip) => handleChipTap(chip, "pronoun")}
-        />
-      )}
+      {/* Chip tray */}
       <ChipTray
         label={mode === "normal" ? "Conjugations" : mode === "fr-sentence" ? "English verbs" : "French verbs"}
         chips={availableVerbChips}
@@ -1451,8 +1408,7 @@ export default function FrenchVerbApp() {
             PRONOUNS.forEach((_, i) => {
               const key = `${tense}--${i}`;
               const verbOk = placements[key] && placements[key].id === key;
-              const pronounOk = mode === "normal" || (pronounPlacements[key] && pronounPlacements[key].pronounIdx === i);
-              if (verbOk && pronounOk) correct++;
+              if (verbOk) correct++;
             });
           });
           return (
@@ -1491,8 +1447,7 @@ export default function FrenchVerbApp() {
             PRONOUNS.forEach((_, i) => {
               const key = `${tense}--${i}`;
               const verbOk = placements[key] && placements[key].id === key;
-              const pronounOk = mode === "normal" || (pronounPlacements[key] && pronounPlacements[key].pronounIdx === i);
-              if (verbOk && pronounOk) correct++;
+              if (verbOk) correct++;
             });
           });
           return (
@@ -1527,7 +1482,7 @@ export default function FrenchVerbApp() {
 }
 
 // Quadrant variant that supports tap-to-place
-function QuadrantWithSlotTap({ tense, verb, placements, pronounPlacements, onDrop, onRemove, checked, corrections, selectedChip, onSlotTap, instantMode, showEnglish, mode }) {
+function QuadrantWithSlotTap({ tense, verb, placements, onDrop, onRemove, checked, corrections, selectedChip, onSlotTap, instantMode, showEnglish, mode }) {
   const colors = TENSE_COLORS[tense];
   const [dragOverSlot, setDragOverSlot] = useState(null);
   const data = VERBS[verb];
@@ -1576,14 +1531,7 @@ function QuadrantWithSlotTap({ tense, verb, placements, pronounPlacements, onDro
           const verbWrong = verbInstantWrong || verbCheckedWrong;
           const verbCanTap = !checked && selectedChip?.kind === "verb" && !verbPlaced;
 
-          const pronounPlaced = twoBox ? (pronounPlacements[key] || null) : null;
-          const pronounInstantCorrect = twoBox && instantMode && pronounPlaced && pronounPlaced.pronounIdx === i;
-          const pronounInstantWrong = twoBox && instantMode && pronounPlaced && pronounPlaced.pronounIdx !== i;
-          const pronounCheckedCorrect = twoBox && checked && corrections && corrections[key]?.pronoun;
-          const pronounCheckedWrong = twoBox && checked && corrections && corrections[key] && !corrections[key].pronoun && pronounPlaced;
-          const pronounCorrect = pronounInstantCorrect || pronounCheckedCorrect;
-          const pronounWrong = pronounInstantWrong || pronounCheckedWrong;
-          const pronounCanTap = twoBox && !checked && selectedChip?.kind === "pronoun" && !pronounPlaced;
+          const pronoun = mode === "fr-sentence" ? ENGLISH_PRONOUNS[i] : PRONOUNS[i];
 
           return (
             <div
@@ -1618,23 +1566,16 @@ function QuadrantWithSlotTap({ tense, verb, placements, pronounPlacements, onDro
                 )}
               </span>
               {twoBox && (
-                <AnswerCell
-                  kind="pronoun"
-                  tense={tense}
-                  i={i}
-                  placed={pronounPlaced}
-                  isCorrect={pronounCorrect}
-                  isWrong={pronounWrong}
-                  isDragOver={dragOverSlot === `pronoun-${i}`}
-                  canTap={pronounCanTap}
-                  checked={checked}
-                  colors={colors}
-                  onDrop={onDrop}
-                  onRemove={onRemove}
-                  onSlotTap={onSlotTap}
-                  onDragOver={() => setDragOverSlot(`pronoun-${i}`)}
-                  onDragLeave={() => setDragOverSlot(null)}
-                />
+                <span style={{
+                  minWidth: 72,
+                  fontSize: 13,
+                  color: "#64748B",
+                  fontStyle: "italic",
+                  textAlign: "right",
+                  flexShrink: 0,
+                }}>
+                  {pronoun}
+                </span>
               )}
               <AnswerCell
                 kind="verb"
@@ -1662,7 +1603,7 @@ function QuadrantWithSlotTap({ tense, verb, placements, pronounPlacements, onDro
           {PRONOUNS.map((_, i) => {
             const key = `${tense}--${i}`;
             const c = corrections[key];
-            if (c && c.verb && c.pronoun) return null;
+            if (c && c.verb) return null;
             const label = mode === "en-sentence" ? data.english_conj[tense][i]
               : mode === "fr-sentence" ? `${PRONOUNS[i]} ${data[tense][i]}`
               : PRONOUNS[i];
